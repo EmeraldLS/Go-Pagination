@@ -17,5 +17,8 @@ func main() {
 	router.POST("/api/products/populate", controller.Populate)
 	router.GET("/api/products/frontend", controller.GetProducts)
 	router.GET("/api/products/backend", controller.GetSingleProduct)
-	router.Run("0.0.0.0:"+ port)
+	if port == "" {
+		port = "3000"
+	}
+	router.Run("0.0.0.0:" + port)
 }
