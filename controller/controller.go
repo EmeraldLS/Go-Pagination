@@ -3,10 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
-	"math"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/bxcodec/faker/v4"
@@ -33,6 +31,7 @@ func Populate(c *gin.Context) {
 		}
 		collection.InsertOne(ctx, product)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
@@ -93,14 +92,17 @@ func GetSingleProduct(c *gin.Context) {
 		}
 	}
 
-	total, _ := collection.CountDocuments(ctx, filter)
+	// total, _ := collection.CountDocuments(ctx, filter)
 
-	page, _ := strconv.Atoi(c.Query("page"))
-	var perPage int64 = 5
-	findOptions.SetSkip(int64(page-1) * perPage)
-	findOptions.SetLimit(perPage)
+	// page, _ := strconv.Atoi(c.Query("page"))
+	// var perPage int64 = 5
+	// findOptions.SetSkip(int64(page-1) * perPage)
+	// findOptions.SetLimit(perPage)
 
-	cursor, _ := collection.Find(ctx, filter, findOptions)
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
 	defer cursor.Close(ctx)
 	for cursor.Next(ctx) {
 		var product model.Product
@@ -108,10 +110,10 @@ func GetSingleProduct(c *gin.Context) {
 		products = append(products, product)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "success",
-		"data":      products,
-		"total":     total,
-		"page":      page,
-		"last_page": math.Ceil(float64(total / perPage)),
+		"message": "success",
+		"data":    products,
+		// "total":     total,
+		// "page":      page,
+		// "last_page": math.Ceil(float64(total / perPage)),
 	})
 }
